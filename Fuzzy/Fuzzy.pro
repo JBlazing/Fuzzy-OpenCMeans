@@ -1,6 +1,15 @@
 TEMPLATE = app
-CONFIG += console c++11
+CONFIG += console c++14
 CONFIG -= app_bundle
 CONFIG -= qt
 
-SOURCES += main.cpp
+
+INCLUDEPATH += /usr/local/include/opencv
+LIBS += -L/usr/local/lib -lopencv_core -lopencv_imgcodecs -lopencv_highgui
+
+
+SOURCES += main.cpp \
+    fuzzycmeans.cpp
+
+HEADERS += \
+    fuzzycmeans.h
