@@ -10,6 +10,7 @@ class FuzzyCmeans
 
     void calcCluster(cv::Mat & , float d_fuzz);
     float updateFuzz(cv::Mat &, float d_fuzz);
+    void initUMatrix(cv::Mat &);
 public:
     FuzzyCmeans(int numItems , int dimensions ,int numClusters);
     void Cluster(cv::Mat &data , float d_fuzz, float ep);

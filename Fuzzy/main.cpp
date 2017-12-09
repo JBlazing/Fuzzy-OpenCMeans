@@ -12,8 +12,8 @@ void parseFile(char * fileName ,cv::Mat & data)
     std::string line;
     std::regex re("(\"([^\"]*)\"|([^,]*))(,|$)");
     data = cv::Mat::zeros(0 , 4 , CV_64F);
-    cv::Mat temp = cv::Mat::zeros(1 , 4 , CV_64F);
-    double * t = temp.ptr<double>();
+    cv::Mat temp = cv::Mat::zeros(1 , 4 , CV_32F);
+    float * t = temp.ptr<float>();
     if(file.is_open())
     {
         while(getline(file , line))
@@ -51,14 +51,20 @@ void parseFile(char * fileName ,cv::Mat & data)
 
 int main()
 {
-    FuzzyCmeans f(2 , 2 , 3);
-    cv::Mat U = f.getU();
+
     cv::Mat Data;
+
     parseFile("~/iris.data" , Data);
+    FuzzyCmeans f(Data.rows , Data.cols , 3);
 
-    std::cout << Data;
+    f.Cluster(Data , 2 ,  .01);
 
-   // cout << U << endl;
+    cv::Mat &U = f.getU();
+    std::cout << U << std::endl;
+
+
+
 }
+
 
 

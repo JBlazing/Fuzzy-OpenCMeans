@@ -3,25 +3,12 @@
 #include <iostream>
 void initUMatrix(cv::Mat & U)
 {
-    cv::RNG rng;
-
+    cv::RNG r = cv::theRNG();
     for(int i = 0 ; i < U.rows ; i++)
     {
-        float s = 1.0f;
-        float * cRow = U.ptr<float>(i);
-        for(int j = 1 ; j < U.cols ; j++)
-        {
-            float tmp;
-            do{
-                tmp = rng.uniform(0.f , 1.f);
-
-            }while( std::isless(s - tmp , 0) );
-
-            cRow[j] = tmp;
-            s -= tmp;
-
-        }
-        cRow[0] = s;
+        cv::Mat t =  U.row(i);
+        r.fill(t , cv::RNG::UNIFORM , 0.0, 1.0);
+        t /= cv::sum(t)[0];
     }
 
 }
@@ -30,7 +17,7 @@ void initUMatrix(cv::Mat & U)
 FuzzyCmeans::FuzzyCmeans(int numItems , int dimensions ,int numClusters)
 {
     U = cv::Mat::zeros(numItems , numClusters , CV_32F);
-    C = cv::Mat::zeros(numItems , dimensions , CV_32F);
+    C = cv::Mat::zeros(numClusters , dimensions , CV_32F);
     initUMatrix(U);
 }
 
@@ -80,9 +67,6 @@ float FuzzyCmeans::updateFuzz(cv::Mat &data , float d_fuzz)
             maxi = std::max(maxi , dif );
             Ur[j] = update;
         }
-
-
-
     }
 
     return maxi;
@@ -92,10 +76,12 @@ float FuzzyCmeans::updateFuzz(cv::Mat &data , float d_fuzz)
 void FuzzyCmeans::Cluster(cv::Mat &data , float d_fuzz , float ep)
 {
     float maxDiff;
+    int epochs;
     do{
 
         calcCluster(data , d_fuzz);
         maxDiff = updateFuzz(data , d_fuzz);
-
+        epochs++;
     }while(std::isgreater(maxDiff , ep));
+    std::cout << epochs << std::endl;
 }
