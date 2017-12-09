@@ -1,7 +1,7 @@
 #include "fuzzycmeans.h"
 #include <cmath>
 #include <iostream>
-void initUMatrix(cv::Mat & U)
+void FuzzyCmeans::initUMatrix(cv::Mat & U)
 {
     cv::RNG r = cv::theRNG();
     for(int i = 0 ; i < U.rows ; i++)
@@ -73,7 +73,7 @@ float FuzzyCmeans::updateFuzz(cv::Mat &data , float d_fuzz)
 
 }
 
-void FuzzyCmeans::Cluster(cv::Mat &data , float d_fuzz , float ep)
+std::tuple<cv::Mat ,cv::Mat> FuzzyCmeans::Cluster(cv::Mat &data , float d_fuzz , float ep)
 {
     float maxDiff;
     int epochs;
@@ -84,4 +84,5 @@ void FuzzyCmeans::Cluster(cv::Mat &data , float d_fuzz , float ep)
         epochs++;
     }while(std::isgreater(maxDiff , ep));
     std::cout << epochs << std::endl;
+    return std::make_tuple(C , U);
 }

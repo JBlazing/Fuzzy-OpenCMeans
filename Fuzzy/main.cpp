@@ -11,7 +11,7 @@ void parseFile(char * fileName ,cv::Mat & data)
     std::ifstream file("iris.data");
     std::string line;
     std::regex re("(\"([^\"]*)\"|([^,]*))(,|$)");
-    data = cv::Mat::zeros(0 , 4 , CV_64F);
+    data = cv::Mat::zeros(0 , 4 , CV_32F);
     cv::Mat temp = cv::Mat::zeros(1 , 4 , CV_32F);
     float * t = temp.ptr<float>();
     if(file.is_open())
@@ -27,7 +27,7 @@ void parseFile(char * fileName ,cv::Mat & data)
                 std::smatch match = *next;
                 //std::cout << match.str() <<'\n';
                 std::string m = match.str();
-                double tp = std::stod(m , nullptr);
+                double tp = std::stof(m , nullptr);
                 t[i] = tp;
 
                 //std::cout << tp << ',';
@@ -57,9 +57,12 @@ int main()
     parseFile("~/iris.data" , Data);
     FuzzyCmeans f(Data.rows , Data.cols , 3);
 
-    f.Cluster(Data , 2 ,  .01);
+    auto tuple = f.Cluster(Data , 2 ,  .01);
+    cv::Mat C = std::get<0>(tuple),
+            U = std::get<1>(tuple);
 
-    cv::Mat &U = f.getU();
+
+
     std::cout << U << std::endl;
 
 

@@ -9,7 +9,9 @@ LIBS += -L/usr/local/lib -lopencv_core -lopencv_imgcodecs -lopencv_highgui
 
 
 SOURCES += main.cpp \
-    fuzzycmeans.cpp
+    fuzzycmeans.cpp \
+    fuzzypca.cpp
 
 HEADERS += \
-    fuzzycmeans.h
+    fuzzycmeans.h \
+    fuzzypca.h

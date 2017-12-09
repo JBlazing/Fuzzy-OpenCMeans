@@ -2,6 +2,7 @@
 #define FUZZYCMEANS_H
 
 #include <opencv2/opencv.hpp>
+#include <tuple>
 
 class FuzzyCmeans
 {
@@ -13,7 +14,8 @@ class FuzzyCmeans
     void initUMatrix(cv::Mat &);
 public:
     FuzzyCmeans(int numItems , int dimensions ,int numClusters);
-    void Cluster(cv::Mat &data , float d_fuzz, float ep);
+    std::tuple<cv::Mat , cv::Mat >
+            Cluster(cv::Mat &data , float d_fuzz, float ep);
     cv::Mat& getU(){return U;}
 };
 
