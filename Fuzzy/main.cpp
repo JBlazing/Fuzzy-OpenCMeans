@@ -1,10 +1,11 @@
 #include <iostream>
-#include "fuzzycmeans.h"
 #include <fstream>
 #include <string>
 #include <regex>
 
-
+#include "fuzzycmeans.h"
+#include "fuzzypca.h"
+#include "sil.h"
 
 void parseFile(char * fileName ,cv::Mat & data)
 {
@@ -57,16 +58,15 @@ int main()
     parseFile("~/iris.data" , Data);
     FuzzyCmeans f(Data.rows , Data.cols , 3);
 
-    auto tuple = f.Cluster(Data , 2 ,  .01);
+    auto tuple = f.Cluster(Data , 2 ,  .001);
     cv::Mat C = std::get<0>(tuple),
             U = std::get<1>(tuple);
 
+    Sil a(Data , U);
+    a.computeSil();
+    cv::Mat avgs = a.getClusterAverages();
 
-
-    std::cout << U << std::endl;
-
-
-
+    std::cout << avgs << std::endl;
 }
 
 

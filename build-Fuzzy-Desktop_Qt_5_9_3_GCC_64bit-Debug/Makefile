@@ -51,9 +51,13 @@ OBJECTS_DIR   = ./
 ####### Files
 
 SOURCES       = ../Fuzzy/main.cpp \
-		../Fuzzy/fuzzycmeans.cpp 
+		../Fuzzy/fuzzycmeans.cpp \
+		../Fuzzy/fuzzypca.cpp \
+		../Fuzzy/sil.cpp 
 OBJECTS       = main.o \
-		fuzzycmeans.o
+		fuzzycmeans.o \
+		fuzzypca.o \
+		sil.o
 DIST          = ../../../Qtt/5.9.3/gcc_64/mkspecs/features/spec_pre.prf \
 		../../../Qtt/5.9.3/gcc_64/mkspecs/common/unix.conf \
 		../../../Qtt/5.9.3/gcc_64/mkspecs/common/linux.conf \
@@ -229,8 +233,12 @@ DIST          = ../../../Qtt/5.9.3/gcc_64/mkspecs/features/spec_pre.prf \
 		../../../Qtt/5.9.3/gcc_64/mkspecs/features/exceptions.prf \
 		../../../Qtt/5.9.3/gcc_64/mkspecs/features/yacc.prf \
 		../../../Qtt/5.9.3/gcc_64/mkspecs/features/lex.prf \
-		../Fuzzy/Fuzzy.pro fuzzycmeans.h ../Fuzzy/main.cpp \
-		../Fuzzy/fuzzycmeans.cpp
+		../Fuzzy/Fuzzy.pro fuzzycmeans.h \
+		fuzzypca.h \
+		sil.h ../Fuzzy/main.cpp \
+		../Fuzzy/fuzzycmeans.cpp \
+		../Fuzzy/fuzzypca.cpp \
+		../Fuzzy/sil.cpp
 QMAKE_TARGET  = Fuzzy
 DESTDIR       = 
 TARGET        = Fuzzy
@@ -638,11 +646,18 @@ compiler_clean:
 
 ####### Compile
 
-main.o: ../Fuzzy/main.cpp ../Fuzzy/fuzzycmeans.h
+main.o: ../Fuzzy/main.cpp ../Fuzzy/fuzzycmeans.h \
+		../Fuzzy/fuzzypca.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../Fuzzy/main.cpp
 
 fuzzycmeans.o: ../Fuzzy/fuzzycmeans.cpp ../Fuzzy/fuzzycmeans.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o fuzzycmeans.o ../Fuzzy/fuzzycmeans.cpp
+
+fuzzypca.o: ../Fuzzy/fuzzypca.cpp ../Fuzzy/fuzzypca.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o fuzzypca.o ../Fuzzy/fuzzypca.cpp
+
+sil.o: ../Fuzzy/sil.cpp ../Fuzzy/sil.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o sil.o ../Fuzzy/sil.cpp
 
 ####### Install
 

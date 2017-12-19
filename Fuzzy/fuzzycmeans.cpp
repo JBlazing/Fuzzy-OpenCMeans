@@ -76,7 +76,7 @@ float FuzzyCmeans::updateFuzz(cv::Mat &data , float d_fuzz)
 std::tuple<cv::Mat ,cv::Mat> FuzzyCmeans::Cluster(cv::Mat &data , float d_fuzz , float ep)
 {
     float maxDiff;
-    int epochs;
+    int epochs = 0;
     do{
 
         calcCluster(data , d_fuzz);
