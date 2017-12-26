@@ -5,15 +5,17 @@ CONFIG -= qt
 
 
 INCLUDEPATH += /usr/local/include/opencv
-LIBS += -L/usr/local/lib -lopencv_core -lopencv_imgcodecs -lopencv_highgui
+LIBS += -L/usr/local/lib -lopencv_core -lopencv_imgcodecs -lopencv_highgui -lopencv_imgproc -lpthread
 
 
 SOURCES += main.cpp \
     fuzzycmeans.cpp \
     fuzzypca.cpp \
-    sil.cpp
+    sil.cpp \
+    silt.cpp
 
 HEADERS += \
     fuzzycmeans.h \
     fuzzypca.h \
-    sil.h
+    sil.h \
+    silt.h

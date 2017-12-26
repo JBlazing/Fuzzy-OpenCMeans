@@ -15,7 +15,7 @@ class FuzzyCmeans
 public:
     FuzzyCmeans(int numItems , int dimensions ,int numClusters);
     std::tuple<cv::Mat , cv::Mat >
-            Cluster(cv::Mat &data , float d_fuzz, float ep);
+            Cluster(cv::Mat &data , float d_fuzz = 2.f, float ep = .01f );
     cv::Mat& getU(){return U;}
 };
 

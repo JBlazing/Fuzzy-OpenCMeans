@@ -14,9 +14,9 @@ struct silInfo{
 
     int num;
     item data;
-    float intraCluster;
-    float interCluster;
-    float silCoe;
+    double intraCluster;
+    double interCluster;
+    double silCoe;
 
     silInfo(item &d , int n){
        data = d;
@@ -27,7 +27,6 @@ struct silInfo{
     }
     void computeCoefficient(){
         this->silCoe = (interCluster - intraCluster) / std::max(intraCluster , interCluster);
-        std::cout << this->silCoe << std::endl;
     }
 
 };

@@ -38,7 +38,7 @@ DISTNAME      = Fuzzy1.0.0
 DISTDIR = /media/john/Secondary/Research/Fuzzy\ CMeans/build-Fuzzy-Desktop_Qt_5_9_3_GCC_64bit-Debug/.tmp/Fuzzy1.0.0
 LINK          = g++
 LFLAGS        = 
-LIBS          = $(SUBLIBS) -L/usr/local/lib -lopencv_core -lopencv_imgcodecs -lopencv_highgui 
+LIBS          = $(SUBLIBS) -L/usr/local/lib -lopencv_core -lopencv_imgcodecs -lopencv_highgui -lopencv_imgproc -lpthread 
 AR            = ar cqs
 RANLIB        = 
 SED           = sed
@@ -53,11 +53,13 @@ OBJECTS_DIR   = ./
 SOURCES       = ../Fuzzy/main.cpp \
 		../Fuzzy/fuzzycmeans.cpp \
 		../Fuzzy/fuzzypca.cpp \
-		../Fuzzy/sil.cpp 
+		../Fuzzy/sil.cpp \
+		../Fuzzy/silt.cpp 
 OBJECTS       = main.o \
 		fuzzycmeans.o \
 		fuzzypca.o \
-		sil.o
+		sil.o \
+		silt.o
 DIST          = ../../../Qtt/5.9.3/gcc_64/mkspecs/features/spec_pre.prf \
 		../../../Qtt/5.9.3/gcc_64/mkspecs/common/unix.conf \
 		../../../Qtt/5.9.3/gcc_64/mkspecs/common/linux.conf \
@@ -235,10 +237,12 @@ DIST          = ../../../Qtt/5.9.3/gcc_64/mkspecs/features/spec_pre.prf \
 		../../../Qtt/5.9.3/gcc_64/mkspecs/features/lex.prf \
 		../Fuzzy/Fuzzy.pro fuzzycmeans.h \
 		fuzzypca.h \
-		sil.h ../Fuzzy/main.cpp \
+		sil.h \
+		silt.h ../Fuzzy/main.cpp \
 		../Fuzzy/fuzzycmeans.cpp \
 		../Fuzzy/fuzzypca.cpp \
-		../Fuzzy/sil.cpp
+		../Fuzzy/sil.cpp \
+		../Fuzzy/silt.cpp
 QMAKE_TARGET  = Fuzzy
 DESTDIR       = 
 TARGET        = Fuzzy
@@ -647,7 +651,8 @@ compiler_clean:
 ####### Compile
 
 main.o: ../Fuzzy/main.cpp ../Fuzzy/fuzzycmeans.h \
-		../Fuzzy/fuzzypca.h
+		../Fuzzy/fuzzypca.h \
+		../Fuzzy/sil.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../Fuzzy/main.cpp
 
 fuzzycmeans.o: ../Fuzzy/fuzzycmeans.cpp ../Fuzzy/fuzzycmeans.h
@@ -658,6 +663,9 @@ fuzzypca.o: ../Fuzzy/fuzzypca.cpp ../Fuzzy/fuzzypca.h
 
 sil.o: ../Fuzzy/sil.cpp ../Fuzzy/sil.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o sil.o ../Fuzzy/sil.cpp
+
+silt.o: ../Fuzzy/silt.cpp ../Fuzzy/silt.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o silt.o ../Fuzzy/silt.cpp
 
 ####### Install
 

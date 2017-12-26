@@ -1,10 +1,10 @@
 #include "sil.h"
 #include <iostream>
-Sil::Sil(item & data , cv::Mat & clusterAssignment)
-{
+#include <utility>
+Sil::Sil(item & data , cv::Mat & clusterAssignment){
     int numCluster = clusterAssignment.cols;
     clusters.resize(numCluster);
-
+    std::cout << numCluster << std::endl;
     //init clusters
     for(int i = 0 ; i < data.rows ; i++){
         item d = data.row(i);
@@ -19,20 +19,25 @@ Sil::Sil(item & data , cv::Mat & clusterAssignment)
 
 }
 
-
-
 void Sil::computeSil()
 {
     std::vector<std::list<silInfo>>::iterator curCluster , otherClusters;
-
-    //for each item compute
+    //compute intra cluster distances
     for(curCluster = clusters.begin() ; curCluster != clusters.end() ; curCluster++)
     {
         for(auto & i : *curCluster)
         {
-            //compute intra cluster distance for each item in each cluster
             std::list<silInfo> & c = *curCluster;
             computeIntraDistance(i , c);
+        }
+    }
+
+
+    //for compute interClusterDistance
+    for(curCluster = clusters.begin() ; curCluster != clusters.end() ; curCluster++)
+    {
+        for(auto & i : *curCluster)
+        {
 
             double mini = INFINITY;
             for(otherClusters = clusters.begin() ; otherClusters != clusters.end() ; otherClusters++)
@@ -66,14 +71,10 @@ void Sil::computeIntraDistance(silInfo & data , std::list<silInfo> & cluster){
 
     for(auto & item : cluster)
     {
-        if(!(data == item))
-        {
-            acum += cv::norm(data.data , item.data);
-        }
+        acum += cv::norm(data.data , item.data);
     }
     data.intraCluster = acum / (double)(cluster.size() - 1);
 }
-
 
 cv::Mat Sil::getClusterAverages(){
 
