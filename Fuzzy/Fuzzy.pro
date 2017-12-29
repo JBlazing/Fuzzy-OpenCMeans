@@ -12,10 +12,12 @@ SOURCES += main.cpp \
     fuzzycmeans.cpp \
     fuzzypca.cpp \
     sil.cpp \
-    silt.cpp
+    silt.cpp \
+    distancematrix.cpp
 
 HEADERS += \
     fuzzycmeans.h \
     fuzzypca.h \
     sil.h \
-    silt.h
+    silt.h \
+    distancematrix.h

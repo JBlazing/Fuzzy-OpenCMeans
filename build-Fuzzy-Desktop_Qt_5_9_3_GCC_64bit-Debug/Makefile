@@ -54,12 +54,14 @@ SOURCES       = ../Fuzzy/main.cpp \
 		../Fuzzy/fuzzycmeans.cpp \
 		../Fuzzy/fuzzypca.cpp \
 		../Fuzzy/sil.cpp \
-		../Fuzzy/silt.cpp 
+		../Fuzzy/silt.cpp \
+		../Fuzzy/distancematrix.cpp 
 OBJECTS       = main.o \
 		fuzzycmeans.o \
 		fuzzypca.o \
 		sil.o \
-		silt.o
+		silt.o \
+		distancematrix.o
 DIST          = ../../../Qtt/5.9.3/gcc_64/mkspecs/features/spec_pre.prf \
 		../../../Qtt/5.9.3/gcc_64/mkspecs/common/unix.conf \
 		../../../Qtt/5.9.3/gcc_64/mkspecs/common/linux.conf \
@@ -238,11 +240,13 @@ DIST          = ../../../Qtt/5.9.3/gcc_64/mkspecs/features/spec_pre.prf \
 		../Fuzzy/Fuzzy.pro fuzzycmeans.h \
 		fuzzypca.h \
 		sil.h \
-		silt.h ../Fuzzy/main.cpp \
+		silt.h \
+		distancematrix.h ../Fuzzy/main.cpp \
 		../Fuzzy/fuzzycmeans.cpp \
 		../Fuzzy/fuzzypca.cpp \
 		../Fuzzy/sil.cpp \
-		../Fuzzy/silt.cpp
+		../Fuzzy/silt.cpp \
+		../Fuzzy/distancematrix.cpp
 QMAKE_TARGET  = Fuzzy
 DESTDIR       = 
 TARGET        = Fuzzy
@@ -652,7 +656,7 @@ compiler_clean:
 
 main.o: ../Fuzzy/main.cpp ../Fuzzy/fuzzycmeans.h \
 		../Fuzzy/fuzzypca.h \
-		../Fuzzy/sil.h
+		../Fuzzy/silt.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o main.o ../Fuzzy/main.cpp
 
 fuzzycmeans.o: ../Fuzzy/fuzzycmeans.cpp ../Fuzzy/fuzzycmeans.h
@@ -666,6 +670,9 @@ sil.o: ../Fuzzy/sil.cpp ../Fuzzy/sil.h
 
 silt.o: ../Fuzzy/silt.cpp ../Fuzzy/silt.h
 	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o silt.o ../Fuzzy/silt.cpp
+
+distancematrix.o: ../Fuzzy/distancematrix.cpp ../Fuzzy/distancematrix.h
+	$(CXX) -c $(CXXFLAGS) $(INCPATH) -o distancematrix.o ../Fuzzy/distancematrix.cpp
 
 ####### Install
 

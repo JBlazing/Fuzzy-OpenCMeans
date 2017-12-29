@@ -1,4 +1,5 @@
 #include "silt.h"
+
 #include <iterator>
 #include <thread>
 #include <utility>
@@ -22,6 +23,7 @@ void computeIntraDistance(silInfo & data , std::list<silInfo> & cluster){
     data.intraCluster = acum / (double)(cluster.size() - 1);
 }
 
+/*
 silT::silT(item & data , cv::Mat & clusterAssignment, int numThreads){
     int numCluster = clusterAssignment.cols;
     clusters.resize(numCluster);
@@ -62,7 +64,7 @@ silT::silT(item & data , cv::Mat & clusterAssignment, int numThreads){
     }
 
 
-    /*
+
     for(int i = 0 ; i < numCluster ; i++){
 
         workers[i].resize(numWorkersPerCluster);
@@ -83,11 +85,10 @@ silT::silT(item & data , cv::Mat & clusterAssignment, int numThreads){
 
         }
     }
-    */
+
 
 }
 
-/*
 void calcCoe(silWorker & w)
 {
     std::list<silInfo>::iterator it,
@@ -109,7 +110,7 @@ void calcCoe(silWorker & w)
     }
 
 }
-*/
+
 
 void calcCoe(silWorker & w)
 {
@@ -135,6 +136,59 @@ void calcCoe(silWorker & w)
         }
     }
 }
+*/
+
+
+void calcCoe(silWorker & w)
+{
+    int end = w.end;
+    std::vector<float> tmps(w.numClusters , 0);
+
+    std::vector<int> &clusterLabels = w.clusterLabels,
+                    counts(w.numClusters , 0);
+
+
+    for(int i = w.start ; i <= end ; i++ ){
+        float * dRow = w.dHat.ptr<float>(i);
+        for(int j = 0 ; j < clusterLabels.size() ; j++ )
+        {
+            if(i != j){
+                int c = clusterLabels[j];
+                tmps[c] += dRow[j];
+                counts[c]++;
+            }
+
+        }
+        float intraCluster = tmps[clusterLabels[i]] / (float)counts[clusterLabels[i]];
+        float interCluster = INFINITY;
+        for(int j = 0 ; j < tmps.size() ; j++){
+            if(j != clusterLabels[i])
+            {
+                float tmp = tmps[j] / (float) counts[j];
+                interCluster = std::min(interCluster , tmp );
+
+            }
+        }
+        w.silCoe[i] = (interCluster - intraCluster) / std::max(intraCluster , interCluster);
+        memset(&tmps[0] , 0 , tmps.size()* sizeof tmps[0]);
+        memset(&counts[0] , 0 , counts.size() * sizeof counts[0]);
+    }
+}
+
+silT::silT(cv::Mat & dMatrix , std::vector<int> & clusterLabels , int numClusters , int numThreads)
+{
+    silCoe.resize(clusterLabels.size() , INFINITY);
+    workers.reserve(numThreads);
+    nClusters = numClusters;
+
+    std::cout << dMatrix.rows << std::endl;
+    for(int i = 1 ; i <= numThreads ; i++)
+    {
+        int start = (i - 1) * dMatrix.rows / numThreads,
+            end   =  i * dMatrix.rows / numThreads - 1;
+        workers.push_back(silWorker{start , end , numClusters , dMatrix , silCoe , clusterLabels  });
+    }
+}
 
 void silT::calcCoefficent()
 {
@@ -143,7 +197,6 @@ void silT::calcCoefficent()
     for(auto & worker : workers){
 
             threads.push_back(std::thread(calcCoe , std::ref(worker)));
-
     }
 
 
@@ -152,18 +205,19 @@ void silT::calcCoefficent()
     }
 
 }
-cv::Mat silT::getClusterAverages(){
 
-    cv::Mat avg =   cv::Mat::zeros(1 , clusters.size() , CV_32F);
+cv::Mat silT::getClusterAverages(std::vector<int> & clusterLabels){
+
+    cv::Mat avg =   cv::Mat::zeros(1 , nClusters , CV_32F);
+    std::vector<int> counts(nClusters , 0 );
     float * avgs = avg.ptr<float>(0);
-    for(int i = 0; i < clusters.size() ; i++)
+    for(int i = 0; i < clusterLabels.size() ; i++)
     {
-        for(auto & s : clusters[i])
-        {
-           avgs[i] += s.silCoe;
-        }
-        avgs[i] /= (float)clusters[i].size();
+        counts[clusterLabels[i]]++;
+        avgs[clusterLabels[i]] += silCoe[i];
     }
+    for(int i = 0 ; i < nClusters ; i++)
+        avgs[i] /= (float)counts[i];
     return avg;
 }
 

@@ -9,10 +9,11 @@
 
 
 #include "fuzzycmeans.h"
-#include "fuzzypca.h"
-//#include "sil.h"
 #include "silt.h"
+#include "distancematrix.h"
 #include <thread>
+
+#define NUMCLUSTERS 3
 void parseFile(char * fileName ,cv::Mat & data)
 {
     std::ifstream file("iris.data");
@@ -54,7 +55,6 @@ void parseFile(char * fileName ,cv::Mat & data)
 
 }
 
-
 void modifyImage(cv::Mat &input , cv::Mat &output)
 {
 
@@ -78,7 +78,17 @@ void modifyImage(cv::Mat &input , cv::Mat &output)
 
 }
 
-void createOutputImgs(cv::Mat image, cv::Mat U,  cv::Size size, std::vector<cv::Mat> & outImgs)
+void preProcess(cv::Mat & inputImage , cv::Mat & convertedImage , cv::Size & newSize)
+{
+    inputImage.convertTo(inputImage , CV_32FC3 , 1./255.);
+    cv::Mat resize;
+    cv::resize(inputImage , resize , newSize);
+    cv::cvtColor(resize , resize , CV_BGR2Luv);
+    inputImage = resize;
+    modifyImage(inputImage , convertedImage);
+}
+
+void createOutputImgs(cv::Mat image, std::vector<int> &clusterLabels,  cv::Size size, std::vector<cv::Mat> & outImgs)
 {
     std::vector< cv::MatIterator_<cv::Vec3f> > its;
     for(int i = 0 ; i < outImgs.size() ; i++)
@@ -90,11 +100,9 @@ void createOutputImgs(cv::Mat image, cv::Mat U,  cv::Size size, std::vector<cv::
     for(int i = 0 ; i < image.rows; i++)
     {
         float *row = image.ptr<float>(i);
-        cv::Mat uRow = U.row(i);
-        cv::Point cluster;
-        cv::minMaxLoc(uRow , NULL , NULL , NULL , &cluster );
+        int cluster = clusterLabels[i];
 
-        cv::MatIterator_<cv::Vec3f> & it = its[cluster.x];
+        cv::MatIterator_<cv::Vec3f> & it = its[cluster];
 
         for(int j = 0; j < 3 ; j++)
            (*it)[j] = row[j];
@@ -106,49 +114,104 @@ void createOutputImgs(cv::Mat image, cv::Mat U,  cv::Size size, std::vector<cv::
 
 }
 
+void getClusterLabels(cv::Mat & U, std::vector<int> & labels )
+{
+    for(int i = 0 ; i < U.rows ; i++)
+    {
+        cv::Mat itmU = U.row(i);
+        cv::Point minLoc , maxLoc;
+
+        cv::minMaxLoc(itmU , NULL , NULL , &minLoc , &maxLoc );
+
+        labels.push_back(maxLoc.x);
+
+    }
+}
+
+void mergeClusters(cv::Mat &data , cv::Mat &mergedClusters  , std::vector<int> & clusterLabels , int whiteCluster)
+{
+    mergedClusters = cv::Mat::zeros(0 , data.cols , data.type());
+    for(int i = 0 ; i < data.rows ; i++)
+    {
+        if(clusterLabels[i] != whiteCluster){
+            mergedClusters.push_back(data.row(i));
+        }
+    }
+}
+
 int main()
 {
 
-    cv::Mat Data = cv::imread("socks.jpg"),
-            out, conveted, rsize;
-    Data.convertTo(Data,  CV_32FC3 , 1.0/255.0);
-    cv::Size s(100,100);
+    cv::Mat Data = cv::imread("flannel.jpeg"),
+            converted, mergedClusters;
+    std::vector< cv::Mat > outImgs;
+    std::vector<int> clusterLabels;
+    cv::Size newSize(100,100);
 
-    cv::resize(Data , rsize , s , 0 , 0 , 1 );
-    cv::cvtColor(rsize , rsize , CV_BGR2HLS );
-    modifyImage(rsize , conveted);
-    //parseFile("~/iris.data" , Data);
+    preProcess(Data , converted , newSize);
 
-    FuzzyCmeans f(conveted.rows , conveted.cols , 3);
+    FuzzyCmeans fuzzCMeans(converted.rows , converted.cols , NUMCLUSTERS);
 
-    auto tuple = f.Cluster(conveted);
+    auto tuple = fuzzCMeans.Cluster(converted);
     cv::Mat C = std::get<0>(tuple),
             U = std::get<1>(tuple);
-    std::cout << U << std::endl;
-    std::cout << "seperating Clusters" << std::endl;
 
-    silT a(conveted , U , std::thread::hardware_concurrency() );
+
+    DistanceMatrix disMat(converted , std::thread::hardware_concurrency());
+    disMat.computeDistanceMatrix();
+    cv::Mat & distanceMatrix = disMat.getDistanceMatrix();
+
+
+    getClusterLabels(U , clusterLabels );
+
+
+
+    silT a(distanceMatrix , clusterLabels, NUMCLUSTERS, std::thread::hardware_concurrency() );
 
     a.calcCoefficent();
 
-
-
-    //Sil a(conveted , U);
-    std::cout << "Clusters Seperated Computing Sil Scores" << std::endl;
-    //a.computeSil();
-    std::cout <<"Done Calculating avgs" << std::endl;
-
-    cv::Mat avgs = a.getClusterAverages();
-
+    cv::Mat avgs = a.getClusterAverages(clusterLabels);
     std::cout << avgs << std::endl;
-    std::vector< cv::Mat > outImgs;
+
     outImgs.resize(U.cols);
 
-    createOutputImgs(conveted  , U ,  rsize.size() , outImgs);
+    cv::Point whiteCluster;
+    cv::minMaxLoc(avgs , NULL,NULL,NULL , &whiteCluster);
+
+    createOutputImgs(converted  , clusterLabels ,  Data.size() , outImgs);
+    mergeClusters(converted , mergedClusters, clusterLabels , whiteCluster.x  );
+
+
+    FuzzyCmeans cmeansMerged(mergedClusters.rows , mergedClusters.cols , 4);
+    auto mTuple = cmeansMerged.Cluster(mergedClusters);
+    cv::Mat C2 = std::get<0>(mTuple),
+            U2 = std::get<1>(mTuple);
+
+    std::vector<int> mergedLabels;
+
+    getClusterLabels(U2 , mergedLabels);
+    DistanceMatrix cmeansMergedDis(mergedClusters , std::thread::hardware_concurrency() );
+    cmeansMergedDis.computeDistanceMatrix();
+    cv::Mat & distanceMatrix_m = cmeansMergedDis.getDistanceMatrix();
+
+    silT m(distanceMatrix_m , mergedLabels , 4 , std::thread::hardware_concurrency());
+    m.calcCoefficent();
+    cv::Mat mAvgs = m.getClusterAverages(mergedLabels);
+
+    std::cout << mAvgs << std::endl;
+
     for(int i = 0 ; i < outImgs.size() ; i++){
-        cv::cvtColor(outImgs[i] , outImgs[i] , CV_HLS2BGR);
-        cv::imshow("Cluster " + i , outImgs[i]);
+        cv::cvtColor(outImgs[i] , outImgs[i] , CV_Luv2BGR);
+        cv::imshow("Cluster " + std::to_string(i) , outImgs[i]);
      }
+
+
+    cv::Mat womboCombo = cv::Mat::zeros(outImgs[0].rows, outImgs[0].cols , CV_32FC3);
+    for(int i = 0 ; i < outImgs.size() ; i++){
+       if(i != whiteCluster.x) womboCombo += outImgs[i];
+    }
+
+    cv::imshow("Cluster Combo" , womboCombo );
     cv::waitKey();
 
 }

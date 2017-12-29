@@ -36,26 +36,28 @@ struct silInfo{
 
 struct silWorker{
 
-    std::vector< std::list<silInfo> > *clusters;
-    //std::list<silInfo> * curCluster;
-
-    //std::list<silInfo>::iterator curClusterStart , curClusterEnd;
-    std::vector < std::list<silInfo>::iterator > clustersStart , clustersEnd;
-
+    int start,
+        end,
+        numClusters;
+    cv::Mat & dHat;
+    std::vector<float> &silCoe;
+    std::vector<int> &clusterLabels;
 };
 
 class silT
 {
 
-    std::vector< std::list<silInfo> > clusters;
 
+    std::vector<float> silCoe;
+    int nClusters;
 
     //std::vector< std::vector<  silWorker >> workers;
     std::vector< silWorker > workers;
 public:
-    silT(item & data , cv::Mat & clusterAssignment , int numThreads);
+    silT(cv::Mat & dMatrix, std::vector<int> & clusterLables, int numClusters  ,int numThreads);
     void calcCoefficent();
-    cv::Mat getClusterAverages();
+    cv::Mat getClusterAverages(std::vector<int> & clusterLabels);
+    std::vector<float>& getSilCoe(){return silCoe;}
 
 
 };

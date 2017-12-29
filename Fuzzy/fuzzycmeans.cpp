@@ -83,6 +83,5 @@ std::tuple<cv::Mat ,cv::Mat> FuzzyCmeans::Cluster(cv::Mat &data , float d_fuzz ,
         maxDiff = updateFuzz(data , d_fuzz);
         epochs++;
     }while(std::isgreater(maxDiff , ep));
-    std::cout << epochs << std::endl;
     return std::make_tuple(C , U);
 }
