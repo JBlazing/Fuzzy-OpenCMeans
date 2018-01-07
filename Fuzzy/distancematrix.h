@@ -14,22 +14,18 @@ public:
 	d_Mat(int numItems)
 	{
 	mat.resize(numItems);
-	for(int i = 0 ; i < numItems ; i++)
-	{
-	  mat[i].resize(i , INFINITY);
+	int i = 0;
+	for(auto & m : mat){
+		m.resize(i);
+		i++;
 	}
 	}
 
-	float operator()(int i , int j) {
+	float& operator()(int i , int j) {
 
 		return (j < i) ?  mat.at(i).at(j) : mat.at(j).at(i);
 	}
-	void setElement(int i , int j , float value){
-		mat[i][j] = value;
-	}
-	float getElement(int i , int j ){
-		return (j < i) ?  mat.at(i).at(j) : mat.at(j).at(i);
-	}
+
 
 };
 

@@ -30,7 +30,8 @@ void computeMartix(dWorker & worker)
             if(i != j){
                 cv::Mat jRow = data.row(j);
 				float tmp =  (float)cv::norm(iRow, jRow);
-				dMat.setElement(i,j,tmp);
+				//dMat.setElement(i,j,tmp);
+				dMat(i,j) = tmp;
             }
 
         }
