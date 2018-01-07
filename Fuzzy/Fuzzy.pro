@@ -1,5 +1,5 @@
 TEMPLATE = app
-CONFIG += console c++14
+CONFIG += console c++17
 CONFIG -= app_bundle
 CONFIG -= qt
 
@@ -13,11 +13,14 @@ SOURCES += main.cpp \
     fuzzypca.cpp \
     sil.cpp \
     silt.cpp \
-    distancematrix.cpp
+    distancematrix.cpp \
+    som.cpp
 
 HEADERS += \
     fuzzycmeans.h \
     fuzzypca.h \
     sil.h \
     silt.h \
-    distancematrix.h
+    distancematrix.h \
+    utils.h \
+    som.h

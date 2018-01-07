@@ -1,5 +1,6 @@
 #include "fuzzypca.h"
 #include <iostream>
+#include <utility>
 FuzzyPCA::FuzzyPCA(cv::Mat &data , cv::Mat & U)
 {
     Uq.resize(U.cols);

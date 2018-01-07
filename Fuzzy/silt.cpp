@@ -149,12 +149,12 @@ void calcCoe(silWorker & w)
 
 
     for(int i = w.start ; i <= end ; i++ ){
-        float * dRow = w.dHat.ptr<float>(i);
+
         for(int j = 0 ; j < clusterLabels.size() ; j++ )
         {
             if(i != j){
                 int c = clusterLabels[j];
-                tmps[c] += dRow[j];
+				tmps[c] += w.dHat(i,j);
                 counts[c]++;
             }
 
@@ -175,17 +175,19 @@ void calcCoe(silWorker & w)
     }
 }
 
-silT::silT(cv::Mat & dMatrix , std::vector<int> & clusterLabels , int numClusters , int numThreads)
+silT::silT(d_Mat & dMatrix , std::vector<int> & clusterLabels , int numClusters , int numThreads)
 {
     silCoe.resize(clusterLabels.size() , INFINITY);
     workers.reserve(numThreads);
     nClusters = numClusters;
 
-    std::cout << dMatrix.rows << std::endl;
+
     for(int i = 1 ; i <= numThreads ; i++)
     {
-        int start = (i - 1) * dMatrix.rows / numThreads,
-            end   =  i * dMatrix.rows / numThreads - 1;
+		int start = (i - 1) * clusterLabels.size() / numThreads,
+			end   =  i * clusterLabels.size() / numThreads - 1;
+
+
         workers.push_back(silWorker{start , end , numClusters , dMatrix , silCoe , clusterLabels  });
     }
 }

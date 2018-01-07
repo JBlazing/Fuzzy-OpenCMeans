@@ -14,7 +14,7 @@ class FuzzyCmeans
     void initUMatrix(cv::Mat &);
 public:
     FuzzyCmeans(int numItems , int dimensions ,int numClusters);
-    std::tuple<cv::Mat , cv::Mat >
+    std::tuple<cv::Mat & , cv::Mat &>
             Cluster(cv::Mat &data , float d_fuzz = 2.f, float ep = .01f );
     cv::Mat& getU(){return U;}
 };

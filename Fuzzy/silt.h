@@ -6,7 +6,7 @@
 #include <vector>
 #include <cmath>
 #include <iostream>
-
+#include "distancematrix.h"
 
 typedef cv::Mat item;
 
@@ -39,7 +39,7 @@ struct silWorker{
     int start,
         end,
         numClusters;
-    cv::Mat & dHat;
+	d_Mat & dHat;
     std::vector<float> &silCoe;
     std::vector<int> &clusterLabels;
 };
@@ -54,7 +54,7 @@ class silT
     //std::vector< std::vector<  silWorker >> workers;
     std::vector< silWorker > workers;
 public:
-    silT(cv::Mat & dMatrix, std::vector<int> & clusterLables, int numClusters  ,int numThreads);
+	silT(d_Mat & dMatrix, std::vector<int> & clusterLables, int numClusters  ,int numThreads);
     void calcCoefficent();
     cv::Mat getClusterAverages(std::vector<int> & clusterLabels);
     std::vector<float>& getSilCoe(){return silCoe;}
